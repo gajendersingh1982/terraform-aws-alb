@@ -191,42 +191,6 @@ resource "aws_lb_listener" "frontend_https" {
           status_code  = lookup(fixed_response.value, "status_code", null)
         }
       }
-
-      # Authentication actions only available with HTTPS listeners
-      dynamic "authenticate_cognito" {
-        for_each = length(keys(lookup(default_action.value, "authenticate_cognito", {}))) == 0 ? [] : [lookup(default_action.value, "authenticate_cognito", {})]
-
-        content {
-          # Max 10 extra params
-          authentication_request_extra_params = lookup(authenticate_cognito.value, "authentication_request_extra_params", null)
-          on_unauthenticated_request          = lookup(authenticate_cognito.value, "on_authenticated_request", null)
-          scope                               = lookup(authenticate_cognito.value, "scope", null)
-          session_cookie_name                 = lookup(authenticate_cognito.value, "session_cookie_name", null)
-          session_timeout                     = lookup(authenticate_cognito.value, "session_timeout", null)
-          user_pool_arn                       = authenticate_cognito.value["user_pool_arn"]
-          user_pool_client_id                 = authenticate_cognito.value["user_pool_client_id"]
-          user_pool_domain                    = authenticate_cognito.value["user_pool_domain"]
-        }
-      }
-
-      dynamic "authenticate_oidc" {
-        for_each = length(keys(lookup(default_action.value, "authenticate_oidc", {}))) == 0 ? [] : [lookup(default_action.value, "authenticate_oidc", {})]
-
-        content {
-          # Max 10 extra params
-          authentication_request_extra_params = lookup(authenticate_oidc.value, "authentication_request_extra_params", null)
-          authorization_endpoint              = authenticate_oidc.value["authorization_endpoint"]
-          client_id                           = authenticate_oidc.value["client_id"]
-          client_secret                       = authenticate_oidc.value["client_secret"]
-          issuer                              = authenticate_oidc.value["issuer"]
-          on_unauthenticated_request          = lookup(authenticate_oidc.value, "on_unauthenticated_request", null)
-          scope                               = lookup(authenticate_oidc.value, "scope", null)
-          session_cookie_name                 = lookup(authenticate_oidc.value, "session_cookie_name", null)
-          session_timeout                     = lookup(authenticate_oidc.value, "session_timeout", null)
-          token_endpoint                      = authenticate_oidc.value["token_endpoint"]
-          user_info_endpoint                  = authenticate_oidc.value["user_info_endpoint"]
-        }
-      }
     }
   }
 
